@@ -1,0 +1,1077 @@
+<style type="text/css">
+    .verifyPopBox {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        z-index: 1000
+    }
+
+    .verifyPopBox .inner {
+        background-color: #FAFAFC;
+        width: 100%;
+        height: auto;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        bottom: 0;
+    }
+
+    .verifyPopBox .verifi_countdown {
+        text-align: center;
+        padding: 12px 0;
+        border-bottom: #e8e8e8 1px solid
+    }
+
+    .verifyPopBox .verifi_countdown strong {
+        color: #F40101
+    }
+
+    .verifyPopBox .verifi_countdown span {
+        display: inline-block;
+        margin: 0 5px;
+        border: #F40101 1px solid;
+        border-radius: 5px;
+        padding: 0 5px;
+    }
+
+    .verifyPopBox .checkimgBox {
+        padding: 5px;
+        position: relative;
+        text-align: center
+    }
+
+    .verifyPopBox .checkimgBox .imgloading {
+        display: inline-block;
+        width: 30px;
+        position: absolute;
+        z-index: 1055;
+        top: 50%;
+        left: 50%;
+        margin-left: -15px;
+        margin-top: -15px
+    }
+
+    .verifyPopBox .checkimgBox .checkimg {
+        width: 100%;
+        min-height: 220px;
+        height: auto
+    }
+
+    .verifyPopBox .checkimgBox .changeBtn_mask {
+        background-color: rgba(0, 0, 0, 0);
+        width: 100%;
+        padding: 0 10px;
+        height: 24%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-sizing: border-box
+    }
+
+    .verifyPopBox .checkimgBox .changeBtn {
+        font-size: 12px;
+        border: #e2e2e2 1px solid;
+        border-radius: 5px;
+        padding: 4px 10px;
+        float: right;
+        margin-top: 20px
+    }
+
+    .verifyPopBox .checkimgBox .changeBtn:active {
+        border: #ccc 1px solid;
+        color: #666
+    }
+
+    .verifyPopBox .btn {
+        height: 46px;
+        padding: 5px 0 15px 0;
+        background-color: #FAFAFC;
+        text-align: center;
+        font-size: 0
+    }
+
+    .verifyPopBox .btn button {
+        width: 44%;
+        height: 46px;
+        font-size: 16px;
+        margin: 0 3%;
+        background-color: #e5e5e5;
+        border-radius: 23px;
+        border: none;
+        color: #666;
+        outline: none;
+        display: inline-block;
+    }
+
+    .verifyPopBox .btn button:active {
+        background-color: #f0f0f0;
+    }
+
+    .verifyPopBox .btn button.checkcode {
+        background-color: #00C798;
+        color: #fff;
+    }
+
+    .verifyPopBox .checkimgBox .marker {
+        display: block;
+        position: absolute;
+        z-index: 10004;
+        width: 24px;
+        height: 24px;
+        border-radius: 12px;
+        margin-left: -6px;
+        margin-top: -4px
+    }
+
+    .regQueueTime_countdown {
+        background-color: rgba(0, 0, 0, 0.6);
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1000
+    }
+
+    .regQueueTime_countdown .box {
+        background-color: #fff;
+        position: fixed;
+        z-index: 1001;
+        border-radius: 10px;
+        width: 60%;
+        height: 120px;
+        left: 20%;
+        top: 50%;
+        margin-top: -60px;
+        text-align: center;
+    }
+
+    .regQueueTime_countdown .box .time {
+        padding: 25px 0 15px 0;
+        font-size: 18px
+    }
+    .regQueueTime_countdown .box .time span {
+        color: #F40101;
+        font-size: 24px
+    }
+
+    .regQueueTime_countdown .box .text {
+        color: #666
+    }
+    .nocardpage {
+        text-align: center;
+        padding-top: 10%
+    }
+    .nocardpage .icon {
+        display: inline-block;
+        background-color: #f5f5f5;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        padding: 15px;
+    }
+    .nocardpage .icon img {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .nocardpage p {
+        padding: 20px 0;
+        color: #888
+    }
+    .btn_disable{
+        background: #ccc
+    }
+</style>
+<!-- 每个独立页面必须指定一个ID, 用于单独创建vue实例 -->
+<div class="reg-selectcard-tip">
+    提示：
+    <p>1.退号需在就诊前一日18:00前完成，之后不能退号。健康卡未实名制认证者，不能自助退号，需到现场窗口退号。</p>
+    <p>2.一张卡1个自然月内限退号3次。</p>
+    <p>3.如微信申请退号失败，请打开个人中心-挂号记录内进行退号。</p>
+    <p>4.预约成功未支付视为爽约，爽约3次则该卡半年内无法通过任何途径预约挂号。</p>
+</div>
+
+<div id="page">
+    <template v-if="cardArray != '' && typeof cardArray == 'object'">
+        <div class="registration_info">
+            <p>挂号信息</p>
+            <span>看诊时间：{{registration_info.date}} {{registration_info.districtName}}</span>
+            <span>医生：{{registration_info.docName}}</span>
+            <span>科室：{{registration_info.deptname}}</span>
+            <span>挂号费用：￥{{registration_info.sumfee}}</span>
+        </div>
+
+        <ul class="select_card_list">
+            <template v-for="(item, index) in cardArray">
+                <li class="select_card_list_li" :class="{'disabled': is_ai && item.userid != ai_userid}" @click="selectMycard(item.userid,item.IDCardNo)">
+                    <div class="select_card_info">
+                        <p>{{item.userName}}
+                            <small class="weiren" v-if="item.IDCardNo == ''">未认证</small>
+                        </p>
+                        <span>电子健康卡号：{{item.cardId}}</span>
+                    </div>
+                    <div class="select_checked">
+                        <i :class="{checked: selectedUserId == item.userid}">
+                            <small></small>
+                        </i>
+                    </div>
+                </li>
+            </template>
+            <a href="/index.php?g=Wap&m=FeyVirtualCard&a=registerPatient" class="binCard" v-if="cardArray.length < 5 ">+ 绑卡/办卡</a>
+        </ul>
+        <a href="javascript:;" class="sure_btn" :class="{btn_color_green: selectedUserId != '' && timerStr == '确认', btn_disable: timerStr != '确认'}" @click="confirmSelectCard">{{timerStr}}</a>
+
+        <!-- 验证码弹出框 -->
+        <transition name="transitionfade">
+            <div class="mask_layer" v-if=" verifyImgSrc !='' " @click="cancel"></div>
+        </transition>
+        <transition name="slide-fade-top">
+            <div class="verifyPopBox" v-if=" verifyImgSrc !='' ">
+                <div class="inner">
+                    <div class="verifi_countdown" v-if="isShowCountdownTime">离挂号还有
+                        <strong>
+                            <span>{{beginTime_countdown.hour}}</span>:
+                            <span>{{beginTime_countdown.minute}}</span>:
+                            <span>{{beginTime_countdown.second}}</span>
+                        </strong>
+                    </div>
+                    <div class="checkimgBox">
+                        <img class="checkimg" :src="verifyImgSrc" @click="addMarker" @load="checkImgLoad" />
+                        <img class="imgloading" v-if="!verifyImgIsLoad" src="/tpl/Wap/default/WxView/static/images/loader.gif" />
+                        <div class="changeBtn_mask">
+                            <a class="changeBtn" @click="changeVerifyImg">换一张</a>
+                        </div>
+                        <em class="marker" v-for="(item, index) in verifyMarker.show" :style="'left:'+item.x+'px; top:'+item.y+'px'" @click="delMarker(index)">
+                            <img src="/tpl/Wap/default/WxView/static/images/optfor_red.png" width="24" />
+                        </em>
+                    </div>
+                    <div class="btn">
+                        <button @click="cancel">取消</button>
+                        <button class="checkcode" @click="confirmAndPost">确定预约</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 排号倒计时 -->
+        <div class="regQueueTime_countdown" v-if="regQueueTime_countdown != ''">
+            <div class="box">
+                <div class="time">
+                    <span>{{regQueueTime_countdown}}</span> 秒
+                </div>
+                <div class="text">
+                    <span>正在取号,请稍等...</span>
+                </div>
+            </div>
+        </div>
+
+    </template>
+
+    <template v-if="cardArray != '' && typeof cardArray == 'string'">
+        <div class="nocardpage">
+            <div class="icon">
+                <img src="/tpl/Wap/default/WxView/static/images/vircard.png" />
+            </div>
+            <p>抱歉，暂无电子健康卡信息</p>
+        </div>
+        <a href="/index.php?g=Wap&m=FeyVirtualCard&a=registerPatient" class="sure_btn btn_color_green">+ 绑卡/办卡</a>
+    </template>
+
+</div>
+
+<!-- 流量统计 -->
+<include file="Public:footer" />
+<script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script>
+    var lastInterval, lastInterval_regQueue;
+    var loading;
+    var w_height = $(window).height();
+    setCookie('card_list_url', window.location.href);
+    var medicalUserId = window.localStorage ? localStorage.getItem("medicalUserId") : getCookie("medicalUserId");
+    function throttle(fn, delay){
+        var start = 0
+        var _delay = delay || 500
+        return function () {
+            var now = new Date()
+            if (now - start >= _delay) {
+                fn.apply(this, arguments);
+                start = now
+            }
+        }
+    }
+    var err_code = {
+        0:"识别成功",
+        10001:"参数错误",
+        10002:"人脸特征检测失败",
+        10003:"身份证号不匹配",
+        10004:"公安比对人脸信息不匹配",
+        10005:"正在检测中",
+        10006:"appid 没有权限（后台验证部分）",
+        10007:"后台获取图片失败",
+        10008:"公安系统失败",
+        10009:"公安未查到身份证照片比对源",
+        10010:"照片质量不满足公安比对要求",
+        10011:"身份证信息未开通公安比对权限",
+        10012:"征信验证失败",
+        10013:"征信系统错误",
+        10014:"公安系统失败，征信系统成功",
+        10015:"公安服务暂时不可用",
+        10016:"存储用户图片失败",
+        10017:"非法 identify_id",
+        10018:"用户信息不存在",
+        10020:"认证超时",
+        10021:"重复的请求，返回上一次的结果",
+        10022:"用户信息错误，请检测 json 格式",
+        10026:"用户身份证数据不在公安比对数据库中",
+        10027:"语音识别失败",
+        10028:"唇动检测失败",
+        10029:"微警超时",
+        10030:"绑定身份证失败",
+        10031:"没有申请征信商户号或公众号/小程序没有设置昵称",
+        10032:"用户身份证数据不再征信数据库中",
+        10040:"请求数据编码不对，必须是 UTF8 编码",
+        10041:"非法 user_id_key",
+        10042:"请求过于频繁，稍后再重试",
+        10045:"系统失败",
+        10052:"请求数超时征信的限制",
+        10057:"检测过程中人脸主体不一致",
+        10066:"人脸流水号 bioid 重复",
+        10069:"活体检测暂时不可用",
+        90100:"用户取消",
+        90101:"用户未授权",
+        90102:"底层库出错",
+        90103:"CDN 上传出错",
+        90104:"获取配置信息出错",
+        90105:"获取确认页信息失败",
+        90106:"相机初始化失败",
+        90107:"用户采集人脸超时",
+        90108:"用户采集过程中都动态剧烈",
+        90109:"设备不支持人脸采集",
+        90199:"未知错误"
+    }
+    var vm = new Vue({
+        el: '#page',
+        data: {
+            tn: "",
+            cardArray: "",
+            registration_info: JSON.parse(unescape(getQueryString("regSchedulidInfo"))),
+            selectedUserId: '',
+            verifyImgSrc: '',
+            isShowCountdownTime: false,
+            beginTime_countdown: {
+                hour: '00',
+                minute: '00',
+                second: '00'
+            },
+            regQueueTime_countdown: '',
+            verifyMarker: {
+                show: [],
+                data: []
+            },
+            verifyImgIsLoad: false,
+
+            is_ai: '',   // 标记: 是否通过智能分诊进入该医生页面
+            ai_userid: "0",
+            getH5PaymentId:'',
+            paymentAert: null,
+            appId: '',
+            faceErrorCount: 3,
+            obstetricId: ['1336', '997', '1383', '1933', '1934'], //产科 锦江/华西、特许门诊产科 、产后复查门诊 锦江/华西 、男科
+            labelId: ['6', '23', '24', '14', '15', '32'], //
+            timerStr: '确认',
+            timer: null,
+            joinTime: '',
+            endTime: '',
+        },
+        created: function () {
+            setDocumentTitle("选择电子健康卡");
+            var _self = this;
+            _self.getCardList();
+            _self.is_ai = getQueryString("is_ai");
+            if(_self.obstetricId.indexOf(getQueryString('deptId')) > -1 || _self.labelId.indexOf(getQueryString('LabelId')) > -1){
+                _self.getServerTime()
+                _self.initWxConfig()
+            }else {
+                _self.timerStr = '确认'
+            }
+        },
+        mounted: function(){
+            // this.showPaymentAert();
+        },
+        methods: {
+            // showPaymentAert: function(id){
+            //     if(id){
+            //         weui.confirm('请确认微信支付是否已完成', {
+            //             title: '温馨提示',
+            //             buttons: [{
+            //                 label: '重新支付',
+            //                 type: 'default',
+            //                 onClick: function(){
+            //                     localStorage.removeItem("H5Payment")
+            //                 }
+            //             }, {
+            //                 label: '已完成支付',
+            //                 type: 'primary',
+            //                 onClick: function(){
+            //                     localStorage.removeItem("H5Payment")
+            //                     window.location.href = "/index.php?g=Wap&m=FeyAppointment&a=processSucess&wx=MbTXENO0O0Ok&id=" + id;
+            //                 }
+            //             }]
+            //         });
+            //     }
+            // },
+            //获取服务器时间
+            getServerTime: function(){
+                var _this = this;
+                //后端时间返回展示倒计时
+                $.get("/index.php?g=WapApi&m=Register&a=checkTime", function (res) {
+                    res = JSON.parse(res)  //后端数据返回问题
+                    var time = res.data.data.time
+                    var startTime = res.data.data.startTime
+                    _this.joinTime = new Date((time + '000')/1)  //进入页面时间
+                    _this.endTime = new Date((startTime + '000')/1)  //默认可预约时间
+                    _this.getTimer()
+                })
+            },
+            getTimer: function(){
+                function $n(i) {
+                    return i < 10 ? "0" + i: i + "";
+                }
+                this.joinTime = new Date();
+                var lefttime = parseInt((this.endTime.getTime() - this.joinTime.getTime()) / 1000);
+                // var d = parseInt(lefttime / (24*60*60))
+                var h = parseInt(lefttime / (60 * 60) % 24);
+                var m = parseInt(lefttime / 60 % 60);
+                var s = parseInt(lefttime % 60);
+                // d = $n(d)
+                h = $n(h);
+                m = $n(m);
+                s = $n(s);
+                this.timerStr = h/1 > 0 ? `${h} 时 ${m} 分 ${s} 秒` : `${m} 分 ${s} 秒`
+                if (lefttime <= 0) {
+                    this.timerStr = '确认'
+                    return;
+                }
+                setTimeout(this.getTimer, 1000);
+            },
+            initWxConfig: function(){
+                var _this = this;
+                // 获取微信授权签名信息
+                $.post("/index.php?g=WapApi&m=Commonapi&a=signPackage",
+                    {ajaxUrl: window.location.origin+window.location.pathname+window.location.search},
+                    function(res){
+                        var signPackage = res.data.signPackage;
+                        _this.appId = signPackage.appId;
+                        wx.config({
+                            // debug: true,
+                            appId: signPackage.appId,
+                            timestamp: signPackage.timestamp,
+                            beta: true,
+                            nonceStr: signPackage.nonceStr,
+                            signature: signPackage.signature,
+                            jsApiList: [
+                                'requestWxFacePictureVerify',
+                                "chooseImage",
+                                "uploadImage"
+                            ]
+                        });
+                    }
+                );
+            },
+            // 开启人脸识别
+            openTencentFaceAi: throttle(function(){
+                var _this = this;
+                var selectedUser = null
+                for(var i=0; i<_this.cardArray.length; i++){
+                    if(_this.cardArray[i].userid == _this.selectedUserId){
+                        selectedUser = _this.cardArray[i]
+                    }
+                }
+                var userinfo = {
+                    "name": selectedUser.userName,
+                    "id_card_number": selectedUser.IDCardNo
+                }
+                // 用于临时线上BUG调试，BUG修复后删除
+                if(getQueryString('is_test_wx_face')){
+                    alert("调用人脸识别接口，用户姓名和身份证号："+JSON.stringify(userinfo))
+                }
+                // 调用人活体检测API
+                wx.ready(function(){
+                    wx.invoke("requestWxFacePictureVerify",{
+                        appid: _this.appId,
+                        request_verify_pre_info: JSON.stringify(userinfo),
+                        check_alive_type: 2,
+                    },function(res) {
+                        if(res.err_code==0){
+                            // _this.formData.user_id_key = res.verify_result;
+                            weui.toast('认证成功', {
+                                duration: 2000,
+                                className: 'custom-classname',
+                                callback: function(){
+                                    loadingTipBox = weui.loading('正在提交', {
+                                        className: 'custom-classname'
+                                    });
+                                    _this.beginSubmitReg('', res.verify_result)
+                                }
+                            });
+
+                        }else{
+
+                            weui.toast(_this.faceErrorCount ? err_code[res.err_code] : '认证取消', {
+                                duration: 1600,
+                                className: 'custom-classname',
+                                callback: function(){
+                                    if(_this.faceErrorCount && res.err_code !== 90100) _this.faceErrorCount--
+                                    if(!_this.faceErrorCount){
+                                        loadpageMethod('checkfacefail.html')
+                                    }
+                                }
+                            });
+                        }
+                    });
+                })
+            }, 3000),
+            // 获取电子健康卡列表
+            getCardList: function () {
+                var _self = this;
+                $.get("/index.php?g=WapApi&m=Card&a=cardList", function (result) {
+                    var res = result;
+                    if (res.state == 1) {
+                        // 获取电子健康卡列表
+                        var mycards = res.data.cardList;
+                        if (mycards.length > 0) {
+                            _self.cardArray = mycards;
+                            if(_self.is_ai && res.data.ai_userid != '0'){
+                                _self.ai_userid = res.data.ai_userid;
+                                _self.selectedUserId = res.data.ai_userid;
+                            }
+                            else if (mycards.length == 1 && mycards[0].IDCardNo != '') {
+                                _self.selectedUserId = mycards[0].userid;
+                            }
+                            else if (medicalUserId) {
+                                _self.selectedUserId = medicalUserId;
+                            }
+                        } else {
+                            _self.cardArray = "暂无电子健康卡"
+                        }
+                    }
+                    if (res.state == '401') {
+                        loadGetToken()
+                    }
+                });
+            },
+            // 选择电子健康卡
+            selectMycard: function (userid, IDCardNo) {
+                var _self = this;
+                _self.selectedUserId = '';
+                if (IDCardNo == '' || IDCardNo == null) {
+                    // 弹窗
+                    dialogTipBox = weui.dialog({
+                        title: '温馨提示',
+                        content: '此电子健康卡还没有通过实名认证，请先完成实名认证再进行预约挂号。',
+                        buttons: [{
+                            label: '取消',
+                            type: 'default',
+                            onClick: function () { }
+                        }, {
+                            label: '去认证',
+                            type: 'primary',
+                            onClick: function () {
+                                // 去认证
+                                window.location.href = "./index.php?g=Wap&m=FeyVirtualCard&a=registerPatient&userid=" + userid + "&type=1"
+                            }
+                        }]
+                    });
+                }
+                else if(_self.is_ai && userid != _self.ai_userid){
+                    _self.selectedUserId = _self.ai_userid;
+                    return;
+                }
+                else{
+                    _self.selectedUserId = userid;
+                }
+            },
+            // 确实当前"选择电子健康卡"，进行下一步
+            confirmSelectCard: function () {
+                var _self = this;
+                if(_self.obstetricId.indexOf(getQueryString('deptId')) > -1 || _self.labelId.indexOf(getQueryString('LabelId')) > -1){
+                    if(this.timerStr !== '确认') return
+                }
+                var getConvenience = getQueryString("convenience");
+                // console.log(_self.selectedUserId);
+
+                if (_self.selectedUserId == '') {
+                    ToastText("请选择电子健康卡", 1800);
+                    return;
+                }
+
+                if (getConvenience) {
+                    // 如果是便民门诊,可直接挂号
+                    _self.beginSubmitReg("");
+                    loadingTipBox = weui.loading('正在提交', {
+                        className: 'custom-classname'
+                    });
+                } else {
+                    // 获取是否需要排号，返回排号合计时,-1为不需要排号
+                    $.get("/index.php?g=WapApi&m=Register&a=getRegQueueStart", {
+                            schedulid: getQueryString("schedulid")
+                        },
+                        function (res) {
+                            if (res.state == 1) {
+                                _self.tn = res.data.tn;
+                                // 获取电子健康卡列表
+                                if (res.data.lasttime == -1) {
+                                    // console.log("不需要排号");
+                                    _self.isShowCountdownTime = false;
+                                } else {
+                                    _self.set_beginTimeCountdown(res.data.lasttime);
+                                }
+                                //产科人脸识别
+                                if(_self.obstetricId.indexOf(getQueryString('deptId')) > -1 || _self.labelId.indexOf(getQueryString('LabelId')) > -1){
+                                    //非大陆国籍不走人脸 后端维护白名单
+                                    var selectedUser = null
+                                    for(var i=0; i<_self.cardArray.length; i++){
+                                        if(_self.cardArray[i].userid == _self.selectedUserId){
+                                            selectedUser = _self.cardArray[i]
+                                        }
+                                    }
+                                    $.get("/index.php?g=WapApi&m=Register&a=isFace", {cardId: selectedUser.IDCardNo}, function (res) {
+                                        if(res.data.data.asdfafs === 'binoigaibno'){
+                                            //人脸
+                                            _self.openTencentFaceAi()
+                                        }else{
+                                            // 弹出验证码
+                                            _self.changeVerifyImg();
+                                        }
+                                    })
+                                }else{
+                                    // 弹出验证码
+                                    _self.changeVerifyImg();
+                                }
+                            }
+                            if (res.state == '401') {
+                                loadGetToken()
+                            }
+                        }
+                    );
+                }
+            },
+
+            /** 以下是验证码操作逻辑 **/
+
+            // ‘换一张’验证码图片
+            changeVerifyImg: function () {
+                var _self = this;
+                _self.verifyImgIsLoad = false;
+                _self.verifyMarker = {
+                    show: [],
+                    data: []
+                };
+
+                _self.verifyImgSrc = "/index.php?g=WapApi&m=FeyVerify&a=createVerify&v=" + Math.random();
+
+                // loadingTipBox = weui.loading('加载中...');
+                // $.get("/index.php?g=WapApi&m=Register&a=getVerifyCodeId",
+                //     function (result) {
+                //         if (result.state == 1) {
+                //             wx.downloadImage({
+                //                 serverId: result.data.server_id,
+                //                 isShowProgressTips: 1,
+                //                 success: function (res) {
+                //                     _self.verifyImgSrc = res.localId;
+                //                     _self.verifyImgIsLoad = true;
+                //                 }
+                //             });
+                //         }else{
+                //             ToastText("获取验证码图片错误", 1800);
+                //         }
+                //         loadingTipBox.hide();
+                //     }
+                // );
+
+            },
+            checkImgLoad: function (e) {
+                this.verifyImgIsLoad = true;
+            },
+            // 设置开始挂号倒计时
+            set_beginTimeCountdown: function (resCountdownTime) {
+                var _self = this;
+                var lastTime_s = resCountdownTime; // 倒计时时间,单位'秒'
+                if (lastTime_s == 0) {
+                    _self.isShowCountdownTime = false;
+                } else {
+                    _self.isShowCountdownTime = true;
+                    // 开始倒计时
+                    lastInterval = setInterval(function () {
+                        if (lastTime_s < 0) {
+                            _self.isShowCountdownTime = false;
+                            clearInterval(lastInterval);
+                            return;
+                        }
+                        // 获取倒计时 分/秒
+                        var resTime = getCountdown(lastTime_s);
+                        if (resTime <= 0) {
+                            _self.isShowCountdownTime = false;
+                            clearInterval(lastInterval);
+                            return;
+                        }
+                        _self.beginTime_countdown = {
+                            hour: resTime.hour,
+                            minute: resTime.minute,
+                            second: resTime.second
+                        };
+                        lastTime_s--;
+                    }, 1000);
+                }
+            },
+            // 添加验证码标记, 并获取坐标
+            addMarker: function (e) {
+                var _self = this;
+                var img_offsetWidth = e.target.offsetWidth,
+                    img_offsetHeight = e.target.offsetHeight;
+
+                // 计算图片与原始图的百分比
+                var imgPerce = Math.round(img_offsetWidth / 824 * 10000) / 100.00;
+                var page_X = e.clientX - e.target.offsetLeft,
+                    page_Y = e.clientY - (w_height - img_offsetHeight - e.target.offsetTop * 2 - 65);
+
+                _self.verifyMarker.show.push({
+                    x: page_X,
+                    y: page_Y
+                });
+                _self.verifyMarker.data.push({
+                    x: Math.round(page_X / imgPerce * 100),
+                    y: Math.round(page_Y / imgPerce * 100)
+                });
+
+                /*
+                var infosss = {
+                    img_offsetWidth: img_offsetWidth,
+                    img_offsetHeight: img_offsetHeight,
+                    imgPerce: imgPerce,
+                    page_X: e.clientX +"-"+ e.target.offsetLeft,
+                    page_Y: e.clientY +"-"+ w_height  +"-"+ img_offsetHeight +"-"+ e.target.offsetTop,
+                    t_page_y: page_Y
+                }
+                alert(JSON.stringify(infosss));
+                */
+            },
+            delMarker: function (id) {
+                var _self = this;
+                _self.verifyMarker.show.splice(id, 1);
+                _self.verifyMarker.data.splice(id, 1);
+            },
+            // 取消
+            cancel: function () {
+                var _self = this;
+                _self.verifyImgSrc = '';
+                // 时间归零
+                clearInterval(lastInterval);
+                _self.beginTime_countdown = {
+                    hour: '00',
+                    minute: '00',
+                    second: '00'
+                }
+            },
+
+            /** 以下是挂号、排号、锁号、查询结果的逻辑 **/
+
+            // 触发‘确定预约’按钮事件时
+
+            //进入挂号、排号流程
+            confirmAndPost: function () {
+                var _self = this;
+                if (_self.verifyMarker.data.length <= 0) {
+                    ToastText("请选择验证码图片", 1800);
+                    return false
+                }
+
+                loadingTipBox = weui.loading('正在提交', {
+                    className: 'custom-classname'
+                });
+
+                // 坐标数组转成字符串格式
+                var postTagArray = '';
+                for (var i = 0; i < _self.verifyMarker.data.length; i++) {
+                    postTagArray += _self.verifyMarker.data[i].x + ',' + _self.verifyMarker.data[i].y + ';'
+                }
+                postTagArray = postTagArray.substr(0, (postTagArray.length - 1));
+
+                // 关闭验证码弹窗
+                _self.cancel();
+
+                // 提交
+                _self.beginSubmitReg(postTagArray);
+
+            },
+            // 提交验证码并返回是否进行排号
+            beginSubmitReg: function (postTagArray, wxCbVerifyCode) {
+                var _self = this;
+
+                $.post("/index.php?g=WapApi&m=Register&a=submitReg", {
+                    tagArray: postTagArray,
+                    schedulid: getQueryString("schedulid"),
+                    deptId: getQueryString('deptId') || '',
+                    userid: _self.selectedUserId,
+                    is_ai: _self.is_ai ? '1' : '',
+                    token: _self.tn,
+                    verifyResult: wxCbVerifyCode
+                },function (res) {
+                    if (res.state == 1) {
+                        if (res.data.type == "queue") {
+                            _self.regQueueResult(res.data.queueid);
+                            loadingTipBox.hide();
+                        }
+
+                        if (res.data.type == "reg") {
+                            _self.reglockingResult(res.data);
+                        }
+
+                    }
+                    if (res.state == 2) {
+                        loadingTipBox.hide();
+
+                        alertTipBox = weui.alert(res.errorMsg, {
+                            buttons: [{
+                                label: '知道了',
+                                type: 'primary',
+                                onClick: function () {
+                                    //_self.changeVerifyImg();
+                                }
+                            }]
+                        });
+                    }
+                    if (res.state == '401') {
+                        loadGetToken()
+                    }
+                });
+            },
+            // 排号，查询排号结果; 返回结果(1:跳转支付, 2:失败, 3:继续访问)
+            regQueueResult: function (queueid) {
+                var _self = this;
+                _self.cancel();
+
+                var last_Time = 100; // 倒计时时间,单位'秒'
+                var setTimeAjax;
+
+                // 开始倒计时
+                lastInterval_regQueue = setInterval(function () {
+                    _self.regQueueTime_countdown = last_Time;
+                    last_Time--;
+
+                    if (last_Time <= 0) {
+                        clearInterval(lastInterval_regQueue);
+                        _self.regQueueTime_countdown = '';
+
+                        dialogTipBox = weui.dialog({
+                            title: '挂号失败',
+                            content: '请求超时,请点击“返回”重新预约',
+                            buttons: [{
+                                label: '返回',
+                                type: 'primary',
+                                onClick: function () {
+                                    clearTimeout(setTimeAjax);
+                                    window.history.back(-1);
+                                }
+                            }]
+                        });
+                    }
+
+                }, 1000);
+
+                regQueueResult_ajax();
+
+                function regQueueResult_ajax() {
+                    $.get("/index.php?g=WapApi&m=Register&a=doRegQueueResult", {
+                            queueid: queueid
+                        },
+                        function (res) {
+                            if (res.state == 1) {
+                                _self.realToPayment(queueid);
+                            }
+                            if (res.state == 2) {
+                                clearInterval(lastInterval_regQueue);
+                                _self.regQueueTime_countdown = '';
+                                alertTipBox = weui.alert(res.errorMsg, {
+                                    title: '温馨提示',
+                                    buttons: [{
+                                        label: '知道了',
+                                        type: 'primary',
+                                        onClick: function () {
+                                            window.history.back(-1);
+                                        }
+                                    }]
+                                });
+                            }
+                            if (res.state == 3) {
+                                setTimeAjax = setTimeout(function () {
+                                    regQueueResult_ajax();
+                                }, 2000);
+                            }
+                        });
+                };
+
+            },
+            // 排号，排号成功后‘锁号’
+            realToPayment: function (queueid) {
+                var _self = this;
+
+                $.get("/index.php?g=WapApi&m=Register&a=realPayment", {
+                        queueid: queueid,
+                        is_ai: _self.is_ai ? '1' : ''
+                    },
+                    function (res) {
+                        clearInterval(lastInterval_regQueue);
+                        _self.regQueueTime_countdown = '';
+
+                        if (res.state == 1) {
+                            _self.reglockingResult(res.data);
+                        }
+                        // 锁号失败
+                        if (res.state == 2) {
+
+                            dialogTipBox = weui.dialog({
+                                title: '挂号失败',
+                                content: res.errorMsg,
+                                className: 'custom-dialog',
+                                buttons: [{
+                                    label: '返回',
+                                    type: 'primary',
+                                    onClick: function () {
+                                        window.history.back(-1);
+                                    }
+                                }]
+                            });
+                        }
+                    }
+                );
+            },
+            // 锁号结果, 统一处理‘排号’和‘不排号’流程的锁号结果
+            reglockingResult: function (resResult) {
+                var _self = this;
+
+                // 关闭loading
+                loadingTipBox.hide();
+
+                // 跳转到H5支付平台
+                if(!resResult.jsApiParameters){
+                    // localStorage.setItem("H5Payment",resResult.id)
+                    window.location.href = resResult.mweb_url;
+                    return;
+                }
+                var storage = window.localStorage;
+                storage.regOkPaymentInfo = JSON.stringify(resResult);
+
+                // 调起支付接口
+                var wxApiCallPay = function () {
+                    WeixinJSBridge.invoke(
+                        'getBrandWCPayRequest',
+                        resResult.jsApiParameters,
+                        function (res) {
+                            if (res.err_msg == "get_brand_wcpay_request:ok") {
+                                // 支付成功
+                                _self.processingAjax(resResult.id);
+                            } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+                                // 取消支付
+                                loadpageMethod('confirmAndPay.html', 'popstate');
+                            } else {
+                                // 支付失败
+                                // console.log("支付失败:" + res.err_msg);
+                            }
+                        }
+                    );
+                };
+                // 是否处于微信浏览器环境中
+                if (typeof WeixinJSBridge == "undefined") {
+                    if (document.addEventListener) {
+                        document.addEventListener('WeixinJSBridgeReady', wxApiCallPay, false);
+                    } else if (document.attachEvent) {
+                        document.attachEvent('WeixinJSBridgeReady', wxApiCallPay);
+                        document.attachEvent('onWeixinJSBridgeReady', wxApiCallPay);
+                    } else {
+                        alertTipBox = weui.alert('当前环境不支持微信支付');
+                    }
+                } else {
+                    wxApiCallPay();
+                }
+
+            },
+            // 支付后，查询挂号状态
+            processingAjax: function (reg_resId) {
+                var _self = this;
+
+                var last_Time = 100; // 倒计时时间,单位'秒'
+                var setTimeAjax_sing;
+
+                // 开始倒计时
+                lastInterval_regQueue = setInterval(function () {
+                    _self.regQueueTime_countdown = last_Time;
+                    last_Time--;
+                    if (last_Time <= 0) {
+                        clearInterval(lastInterval_regQueue);
+                        _self.regQueueTime_countdown = '';
+                        alertTipBox = weui.alert('请求超时,请稍后再试', {
+                            buttons: [{
+                                label: '返回',
+                                type: 'primary',
+                                onClick: function () {
+                                    clearTimeout(setTimeAjax_sing);
+                                    window.history.back(-1);
+                                }
+                            }]
+                        });
+                    }
+
+                }, 1000);
+
+                processingAjax_post();
+
+                function processingAjax_post() {
+                    $.get("/index.php?g=WapApi&m=Register&a=processingAjax", {
+                            id: reg_resId
+                        },
+                        function (res) {
+                            if (res.state == 1) {
+
+                                //process: 0等待 1挂号成功 2挂号失败
+                                if (res.data.process == 0) {
+                                    setTimeAjax_sing = setTimeout(function () {
+                                        processingAjax_post();
+                                    }, 2000);
+                                    return false;
+                                }
+                                if (res.data.process == 1) {
+                                    if (alertTipBox) alertTipBox.hide();
+                                    window.location.href = "/index.php?g=Wap&m=FeyAppointment&a=processing&wx=MbTXENO0O0Ok&id=" + reg_resId;
+
+                                }
+                                if (res.data.process == 2) {
+                                    if (alertTipBox) alertTipBox.hide();
+                                    window.location.href = '/index.php?g=Wap&m=FeyAppointment&a=processFail&id=' + reg_resId;
+                                }
+                                if (res.data.process == 3) {
+                                    if (alertTipBox) alertTipBox.hide();
+                                    window.location.href = "/index.php?g=Wap&m=FeyAppointment&a=convenienceHome&wx=MbTXENO0O0Ok";
+                                }
+                            }
+                        }
+                    );
+                }
+
+            }
+        }
+    });
+
+    // 判断页面是打开还是返回
+    // window.addEventListener('pageshow', function (event) {
+    //     alert("addEventListener: pageshow")
+    //     if(event.persisted || window.performance && window.performance.navigation.type == 2){
+    //         var H5Payment = localStorage.getItem("H5Payment")
+    //         var isThisPage = window.location.hash.indexOf('selectCard.html') != -1
+    //         if(H5Payment && vm && isThisPage) vm.showPaymentAert(H5Payment);
+    //     }
+    // },false);
+</script>
