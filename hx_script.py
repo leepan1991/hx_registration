@@ -1,4 +1,3 @@
-from mitmproxy import ctx
 from urllib.parse import unquote
 from image_util import save_image, generate_bar_code, open_image, add_bg_for_qr, image_add_text
 from config import global_config
