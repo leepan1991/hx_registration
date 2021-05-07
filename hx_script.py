@@ -1,30 +1,40 @@
-from urllib.parse import unquote
-from image_util import save_image, generate_bar_code, open_image, add_bg_for_qr, image_add_text
-from config import global_config
+from time_util import get_today
+from mitmproxy import ctx
+import time
 
 
 def request(flow):
     request = flow.request
-    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Card&a=cardList':
+    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=submitReg':
         cookies = dict(request.cookies)  # 转换cookies格式为dict
-        print(str(cookies))
-        print("==================原始=========================")
-        print(cookies['card_list_url'])
-        print("====================一次decode=======================")
-        bar_code_value = unquote(cookies['card_list_url'])
-        print(bar_code_value)
-        img = generate_bar_code(bar_code_value)
-        img_name = global_config.getRaw('account', 'img_name') + ".png"
-        save_image(img, img_name)
+        urlencoded_form = dict(request.urlencoded_form)
+        print("SubmitReg Cookies:" + str(cookies))
+        print("SubmitReg Urlencoded_Form:" + str(urlencoded_form))
+        today_timestamp_eight = get_today()
+        current_time = time.time()
+        time_diff = today_timestamp_eight + 15 - current_time
+        print("SubmitReg diff time: " + str(time_diff))
+        if time_diff > 0:
+            print("正在等待时间到达8点，请稍后...")
+            time.sleep(time_diff)
+        print("时间到达，开始执行...")
+        # ctx.master.shutdown()
 
-        open_image(add_bg_for_qr(img_name))
-        print("====================四次decode=======================")
-        print(unquote(unquote(unquote(unquote(cookies['card_list_url'])))))
+
+def response(flow):
+    request = flow.request
+    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=checkTime':
+        text = flow.response.get_text()
+        print("CheckTime Old RESP: " + text)
+        today_timestamp = get_today()
+        text = text.replace(str(today_timestamp), str(today_timestamp - 45))
+        print("CheckTime New RESP: " + text)
+        flow.response.set_text(text)
+
+    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=submitReg':
+        text = flow.response.get_text()
+        print("SubmitReg RESP: " + text)
 
 
 if __name__ == '__main__':
-    # add_bg_for_qr('test.png')
-    # img = image_add_text("test.png", '李攀_592328410', 50, 100, text_color=(0, 0, 0), text_size=20)
-    # save_image(img, 'test.png')
-    var_name = global_config.getRaw('account', 'img_name')
-    print(var_name)
+    time.sleep(2.35624)
