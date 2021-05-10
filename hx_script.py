@@ -11,7 +11,7 @@ def request(flow):
         print("SubmitReg Cookies:" + str(cookies))
         print("SubmitReg Urlencoded_Form:" + str(urlencoded_form))
         today_timestamp_eight = get_today()
-        current_time = time.time()
+        current_time = int(time.mktime(time.time()))
         time_diff = today_timestamp_eight + 15 - current_time
         print("SubmitReg diff time: " + str(time_diff))
         if time_diff > 0:
