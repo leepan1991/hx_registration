@@ -1,5 +1,7 @@
 from time_util import get_today
 from mitmproxy import ctx
+from mitmproxy import http
+import json
 import datetime
 import time
 
@@ -27,6 +29,12 @@ def request(flow):
         print(get_date_time() + "===>时间到达，开始执行...")
         # ctx.master.shutdown()
 
+    if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=doRegQueueResult'):
+        print(get_date_time() + "===>doRegQueueResult，执行...")
+
+    if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=realPayment'):
+        print(get_date_time() + "===>realPayment，执行...")
+
 
 def response(flow):
     request = flow.request
@@ -41,12 +49,18 @@ def response(flow):
     if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=submitReg':
         text = flow.response.get_text()
         print(get_date_time() + "===>SubmitReg RESP: " + text)
+        # resp_data = json.loads(text)
+        # resp_data["state"] = 1
+        # resp_data["errorMsg"] = "成功"
+        # resp_data["data"] = {"type": "queue", "queueid": 100}
+        # print(get_date_time() + "===>SubmitReg2 RESP: " + json.dumps(resp_data))
+        # flow.response.set_text(json.dumps(resp_data))
 
-    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=doRegQueueResult':
+    if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=doRegQueueResult'):
         text = flow.response.get_text()
         print(get_date_time() + "===>DoRegQueueResult RESP: " + text)
 
-    if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=realPayment':
+    if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=realPayment'):
         text = flow.response.get_text()
         print(get_date_time() + "===>RealPayment RESP: " + text)
 
