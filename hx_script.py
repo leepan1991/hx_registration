@@ -21,7 +21,7 @@ def request(flow):
         print(get_date_time() + "===>SubmitReg Urlencoded_Form:" + str(urlencoded_form))
         today_timestamp_eight = get_today()
         current_time = int(time.time())
-        time_diff = today_timestamp_eight + 15 - current_time
+        time_diff = today_timestamp_eight + 16 - current_time
         print(get_date_time() + "===>SubmitReg diff time: " + str(time_diff))
         if time_diff > 0:
             print(get_date_time() + "===>正在等待时间到达8点，请稍后...")
