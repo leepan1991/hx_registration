@@ -31,6 +31,7 @@ def request(flow):
 
     if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=doRegQueueResult'):
         print(get_date_time() + "===>doRegQueueResult，执行...")
+        print("===>doRegQueueResult headers" + str(request.headers))
 
     if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=realPayment'):
         print(get_date_time() + "===>realPayment，执行...")
@@ -39,6 +40,7 @@ def request(flow):
 def response(flow):
     request = flow.request
     if request.url == 'https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=checkTime':
+        print("===>checkTime headers" + str(request.headers))
         text = flow.response.get_text()
         print(get_date_time() + "===>CheckTime Old RESP: " + text)
         today_timestamp = get_today()
@@ -52,7 +54,7 @@ def response(flow):
         # resp_data = json.loads(text)
         # resp_data["state"] = 1
         # resp_data["errorMsg"] = "成功"
-        # resp_data["data"] = {"type": "queue", "queueid": 100}
+        # resp_data["data"] = {"type": "queue", "queueid": 16660}
         # print(get_date_time() + "===>SubmitReg2 RESP: " + json.dumps(resp_data))
         # flow.response.set_text(json.dumps(resp_data))
 
