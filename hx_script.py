@@ -54,13 +54,14 @@ def response(flow):
         # resp_data = json.loads(text)
         # resp_data["state"] = 1
         # resp_data["errorMsg"] = "成功"
-        # resp_data["data"] = {"type": "queue", "queueid": 16660}
+        # resp_data["data"] = {"type": "queue", "queueid": 16678}
         # print(get_date_time() + "===>SubmitReg2 RESP: " + json.dumps(resp_data))
         # flow.response.set_text(json.dumps(resp_data))
 
     if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=doRegQueueResult'):
         text = flow.response.get_text()
         print(get_date_time() + "===>DoRegQueueResult RESP: " + text)
+        # ctx.master.shutdown()
 
     if request.url.startswith('https://huaxi2.mobimedical.cn/index.php?g=WapApi&m=Register&a=realPayment'):
         text = flow.response.get_text()
